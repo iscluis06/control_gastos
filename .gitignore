@@ -1,0 +1,5 @@
+.env
+notas_desa.txt
+venv
+.idea
+**__pycache__*
