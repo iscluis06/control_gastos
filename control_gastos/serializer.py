@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from control_gastos.models import Cuenta
+from control_gastos.models import Cuenta, Categoria, Subcategoria, Transaccion, DetalleTransaccion
+
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -12,7 +13,27 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         model = Group
         fields = ["url", "name"]
 
-class CuentasSerializer(serializers.HyperlinkedModelSerializer):
+class CuentasSerializer(serializers.ModelSerializer):
     class Meta:
         model = Cuenta
-        fields = '__all__'
+        fields = "__all__"
+
+class CategoriaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Categoria
+        fields = "__all__"
+
+class SubcategoriaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Subcategoria
+        fields = "__all__"
+
+class TransaccionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Transaccion
+        fields = "__all__"
+
+class DetalleTransaccionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DetalleTransaccion
+        fields = "__all__"
