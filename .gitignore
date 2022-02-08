@@ -3,3 +3,5 @@ notas_desa.txt
 venv
 .idea
 **__pycache__*
+idea_scratches/*.env.json
+**/migrations

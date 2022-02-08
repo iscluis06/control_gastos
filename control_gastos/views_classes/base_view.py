@@ -17,13 +17,21 @@ class BaseView(APIView):
         self.serializer_actual: ModelSerializer = serializer
         super().__init__(**kwargs)
 
-    def get(self, request, pk=None, count=False, format=None):
+    def get(self, request, pk=None, count=False, limit=0, format=None):
         try:
             if count:
                 instancias = self.modelo_actual.objects.all()
                 counting = {"count": len(instancias)}
                 return JsonResponse(counting, status=status.HTTP_200_OK)
-            if (pk != None):
+            elif (limit != 0):
+                instancia = None
+                if(limit<0):
+                    instancia = self.modelo_actual.objects.all()
+                else:
+                    instancia = self.modelo_actual.objects.all().order_by('-pk')[:limit]
+                serializer = self.serializer_actual(instancia, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            elif (pk != None):
                 instancia = self.modelo_actual.objects.get(pk=pk)
                 serializer = self.serializer_actual(instancia)
                 return Response(serializer.data, status=status.HTTP_200_OK)
@@ -36,7 +44,8 @@ class BaseView(APIView):
 
     def post(self, request, format=None):
         data = JSONParser().parse(request)
-        serializer = self.serializer_actual(data=data)
+        context = {"request": request}
+        serializer = self.serializer_actual(data=data, context=context)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -45,9 +54,10 @@ class BaseView(APIView):
     def put(self, request, pk, format=None):
         instance = self.modelo_actual.objects.get(pk=pk)
         data = JSONParser().parse(request)
+        propiedad_usuario = self._obtenerPropiedadUsuario()
         serializer = self.serializer_actual(instance, data=data)
-        if serializer.is_valid():
-            serializer.save()
+        if serializer.is_valid() and propiedad_usuario:
+            serializer.save(propiedad_usuario=request.user)
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
 
@@ -59,3 +69,26 @@ class BaseView(APIView):
             return JsonResponse(is_deleted, status=status.HTTP_200_OK)
         except Exception as err:
             return JsonResponse({"error": "error {error}".format(error=err)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def _filterFunction(self, variable):
+        buscar = 'usuario'
+        if (buscar in variable):
+            substr = variable[variable.index(buscar):]
+            if (substr == buscar):
+                return True
+            else:
+                return False
+        else:
+            return False
+
+    def _obtenerPropiedadUsuario(self):
+        try:
+            propeidadesFiltradas = filter(self._filterFunction, dir(self.modelo_actual))
+            propeidadesFiltradas = list(propeidadesFiltradas)
+            if(len(propeidadesFiltradas)>0):
+                return propeidadesFiltradas[0]
+            else:
+                return None
+        except Exception as exception:
+            print(exception)
+            return None

@@ -1,0 +1,75 @@
+###
+#LOGIN
+POST http://{{url}}:{{port}}/api-token-auth/
+Content-Type: application/json
+
+{
+  "username": "{{usuario}}",
+  "password": "{{password}}"
+}
+
+> {%
+  client.global.set("token", response.body.token)
+ %}
+
+###
+GET http://{{url}}:{{port}}/control_gastos/cuentas
+Authorization: Token {{token}}
+Accept: application/json
+
+###
+#CUENTAS
+POST http://{{url}}:{{port}}/control_gastos/cuentas
+Authorization: Token {{token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "cuenta_tipo": "A",
+  "cuenta_debe": 0.0,
+  "cuenta_haber": 0.0,
+  "cuenta_nombre": "Banco Santander"
+}
+
+###
+GET http://{{url}}:{{port}}/control_gastos/cuentas
+Authorization: Token {{token}}
+Accept: application/json
+
+
+###
+GET http://{{url}}:{{port}}/control_gastos/cuentas/8
+Authorization: Token {{token}}
+Accept: application/json
+
+###
+PUT http://{{url}}:{{port}}/control_gastos/cuentas/8
+Authorization: Token {{token}}
+Accept: application/json
+Content-Type: application/json
+
+{
+  "cuenta_tipo": "A",
+  "cuenta_debe": 1.0,
+  "cuenta_haber": 0.0,
+  "cuenta_nombre": "Banco Santander"
+}
+
+
+###
+GET http://{{url}}:{{port}}/control_gastos/cuentas/count/1
+Authorization: Token {{token}}
+Accept: application/json
+Content-Type: application/json
+
+###
+DELETE http://{{url}}:{{port}}/control_gastos/cuentas/7
+Authorization: Token {{token}}
+Accept: application/json
+Content-Type: application/json
+
+###
+GET http://{{url}}:{{port}}/control_gastos/balance
+Authorization: Token {{token}}
+Accept: application/json
+Content-Type: application/json

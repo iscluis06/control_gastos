@@ -1,4 +1,6 @@
 from django.urls import path
+
+from control_gastos.views_classes.balance import Balance
 from control_gastos.views_classes.categorias import Categorias
 from control_gastos.views_classes.cuentas import Cuentas
 from control_gastos.views_classes.detalle_transacciones import DetalleTransacciones
@@ -13,4 +15,6 @@ for view in views:
     class_name = view.__name__.lower()
     urlpatterns.append(path("{}".format(class_name), view.as_view()))
     urlpatterns.append(path("{}/<int:pk>".format(class_name), view.as_view()))
+    urlpatterns.append(path("{}/limit/<int:limit>".format(class_name), view.as_view()))
     urlpatterns.append(path("{}/count/<int:count>".format(class_name), view.as_view()))
+urlpatterns.append(path("balance", Balance.as_view()))
