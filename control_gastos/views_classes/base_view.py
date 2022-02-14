@@ -17,15 +17,15 @@ class BaseView(APIView):
         self.serializer_actual: ModelSerializer = serializer
         super().__init__(**kwargs)
 
-    def get(self, request, pk=None, count=False, limit=0, format=None):
+    def get(self, request, pk=None, count=False, limit=None, format=None):
         try:
             if count:
                 instancias = self.modelo_actual.objects.all()
                 counting = {"count": len(instancias)}
                 return JsonResponse(counting, status=status.HTTP_200_OK)
-            elif (limit != 0):
+            elif (limit != None):
                 instancia = None
-                if(limit<0):
+                if(limit==0):
                     instancia = self.modelo_actual.objects.all()
                 else:
                     instancia = self.modelo_actual.objects.all().order_by('-pk')[:limit]

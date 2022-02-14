@@ -3,14 +3,9 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class Cuenta(models.Model):
-    TIPO_CUENTA = (
-        ('A', 'Activo'),
-        ('P', 'Pasivo')
-    )
     cuenta_id = models.AutoField(primary_key=True,)
-    cuenta_tipo = models.CharField(max_length=1, choices=TIPO_CUENTA, null=False)
-    cuenta_debe = models.DecimalField(max_digits=25, decimal_places=4, default=0.0)
-    cuenta_haber = models.DecimalField(max_digits=25, decimal_places=4, default=0.0)
+    cuenta_deuda = models.BooleanField(default=False)
+    cuenta_monto = models.DecimalField(max_digits=25, decimal_places=4)
     cuenta_nombre = models.CharField(max_length=200, null=False, blank=False, unique=True)
     cuenta_creada = models.DateTimeField(auto_now_add=True)
     cuenta_modificada = models.DateTimeField(auto_now=True)
@@ -42,19 +37,12 @@ class Transaccion(models.Model):
     def save(self, *args, **kwargs):
         super(Transaccion, self).save(*args, **kwargs)
         cuenta = Cuenta.objects.get(pk=self.transaccion_cuenta.cuenta_id)
-        if cuenta.cuenta_tipo == 'A' and self.transaccion_cantidad > 0:
-            cuenta.cuenta_debe += self.transaccion_cantidad
-        elif cuenta.cuenta_tipo == 'A' and self.transaccion_cantidad < 0:
-            cuenta.cuenta_haber += self.transaccion_cantidad
-        elif cuenta.cuenta_tipo == 'P' and self.transaccion_cantidad > 0:
-            cuenta.cuenta_haber += self.transaccion_cantidad
-        elif cuenta.cuenta_tipo == 'P' and self.transaccion_cantidad < 0:
-            cuenta.cuenta_debe += self.transaccion_cantidad
+        cuenta.cuenta_monto += self.transaccion_cantidad
         cuenta.save()
 
 class DetalleTransaccion(models.Model):
     detalle_trasanccion_id = models.AutoField(primary_key=True)
-    detalle_transaccion_transaccion = models.ForeignKey(Transaccion, on_delete=models.CASCADE)
+    detalle_transaccion_transaccion = models.OneToOneField(Transaccion, on_delete=models.CASCADE)
     detalle_transaccion_nombre = models.CharField(null=False, max_length=200)
     detalle_transaccion_descripcion = models.CharField(null=True, max_length=500)
     detalle_transaccion_fecha = models.DateTimeField(auto_now_add=True)

@@ -45,6 +45,7 @@ class TransaccionSerializer(serializers.ModelSerializer):
     nombre_usuario = serializers.CharField(required=False, source='transaccion_usuario.username')
     nombre_cuenta = serializers.CharField(required=False, source='transaccion_cuenta.cuenta_nombre')
     nombre_subcategoria = serializers.CharField(required=False, source='transaccion_subcategoria.subcategoria_nombre')
+    detalle_transaccion = serializers.IntegerField(required=False, source='detalletransaccion.detalle_trasanccion_id')
     class Meta:
         model = Transaccion
         fields = "__all__"

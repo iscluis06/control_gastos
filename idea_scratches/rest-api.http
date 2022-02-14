@@ -73,3 +73,9 @@ GET http://{{url}}:{{port}}/control_gastos/balance
 Authorization: Token {{token}}
 Accept: application/json
 Content-Type: application/json
+
+###
+GET http://{{url}}:{{port}}/control_gastos/transacciones
+Authorization: Token {{token}}
+Accept: application/json
+Content-Type: application/json

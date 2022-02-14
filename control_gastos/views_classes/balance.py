@@ -9,19 +9,13 @@ class Balance(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        cuentas_activas = Cuenta.objects.filter(cuenta_tipo='A')
-        cuentas_activas_cargo = 0
-        cuentas_activas_abono = 0
-        for cuenta in cuentas_activas:
-            cuentas_activas_cargo += cuenta.cuenta_debe
-            cuentas_activas_abono += cuenta.cuenta_haber
-        cuentas_activas_total = cuentas_activas_abono + cuentas_activas_cargo
-        cuentas_pasivo = Cuenta.objects.filter(cuenta_tipo='P')
-        cuentas_pasivo_cargo = 0
-        cuentas_pasivo_abono = 0
-        for cuenta in cuentas_pasivo:
-            cuentas_pasivo_cargo += cuenta.cuenta_debe
-            cuentas_pasivo_abono += cuenta.cuenta_haber
-        cuentas_pasivo_total = -cuentas_pasivo_abono + cuentas_pasivo_cargo
-        total = cuentas_activas_total + cuentas_pasivo_total
-        return JsonResponse({"capital": cuentas_activas_total, "deuda": cuentas_pasivo_total, "total":total}, status=status.HTTP_200_OK)
+        cuentas_deuda = Cuenta.objects.filter(cuenta_deuda=True)
+        cuentas_deuda_monto = 0
+        for cuenta in cuentas_deuda:
+            cuentas_deuda_monto += cuenta.cuenta_monto
+        cuentas_capital = Cuenta.objects.filter(cuenta_deuda=False)
+        cuentas_capital_monto = 0
+        for cuenta in cuentas_capital:
+            cuentas_capital_monto += cuenta.cuenta_monto
+        total = cuentas_capital_monto - cuentas_deuda_monto
+        return JsonResponse({"capital": cuentas_capital_monto, "deuda": cuentas_deuda_monto, "total":total}, status=status.HTTP_200_OK)
